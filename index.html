@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readme</title>
+</head>
+<body>
+    <h1>Readme</h1>
+
+    <h2>1. Descrição dos Testes</h2>
+    <p>Os testes foram realizados usando JUnit, com Gradle como ferramenta de build. Eles estão localizados no diretório <code>solutis-dev-trail-heranca/src/test/java/org/solutis/heranca</code>.</p>
+
+    <h2>2. Incluir Screenshot do Resultado dos Testes</h2>
+    <p>Adicione capturas de tela que mostram os resultados dos testes.</p>
+
+    <h1>Testes</h1>
+
+    <h3>1. Anotações do JUnit</h3>
+    <p>No JUnit, você pode utilizar as anotações <code>@BeforeEach</code> ou <code>@BeforeAll</code> para configurar objetos ou estados comuns a todos os testes.</p>
+    <ul>
+        <li><strong><code>@BeforeEach</code></strong>: Executa um método antes de cada teste, ideal para inicializar ou resetar o estado antes de cada caso de teste.</li>
+        <li><strong><code>@BeforeAll</code></strong>: Executa um método uma única vez antes de todos os testes na classe, ideal para operações que são caras ou não precisam ser repetidas para cada teste.</li>
+    </ul>
+    <p>No seu caso, se você quiser inicializar o objeto <code>Administrador</code> antes de cada teste, pode usar <code>@BeforeEach</code>. Veja um exemplo:</p>
+    <pre><code class="language-java">package org.solutis.heranca;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class AdministradorTest {
+
+    private Administrador administrador;
+
+    @BeforeEach
+    public void setUp() {
+        administrador = new Administrador("João", "Rua das Flores", "1234-5678", 10, 3000.0, 15.0, 500.0);
+    }
+
+    @Test
+    public void testAdministradorConstrutorComTodosOsParametros() {
+        assertEquals("João", administrador.getNome(), "Nome deve ser 'João'");
+        assertEquals("Rua das Flores", administrador.getEndereco(), "Endereço deve ser 'Rua das Flores'");
+        assertEquals("1234-5678", administrador.getTelefone(), "Telefone deve ser '1234-5678'");
+        assertEquals(10, administrador.getCodigoSetor(), "Código do setor deve ser 10");
+        assertEquals(3000.0, administrador.getSalarioBase(), 0.01, "Salário base deve ser 3000.0");
+        assertEquals(15.0, administrador.getImposto(), 0.01, "Imposto deve ser 15.0");
+        assertEquals(500.0, administrador.getAjudaDeCusto(), 0.01, "Ajuda de custo deve ser 500.0");
+    }
+
+    // Outros testes aqui...
+}
+</code></pre>
+
+    <h3>2. Testar a Herança</h3>
+    <p>Como <code>Administrador</code>, por exemplo, herda de <code>Empregado</code>, é importante garantir que os métodos da classe <code>Empregado</code> estejam funcionando corretamente quando utilizados através de uma instância de <code>Administrador</code>. Verifique se todas as classes estão testando as respectivas heranças.</p>
+
+    <h3>3. Testar Construtores com Valores Inválidos</h3>
+    <p>Crie testes para verificar como a classe lida com valores inválidos, como números negativos para <code>ajudaDeCusto</code>, <code>salarioBase</code>, ou <code>imposto</code>. Isso ajudará a garantir que a classe seja robusta contra entradas inesperadas.</p>
+    <pre><code class="language-java">@Test
+public void testConstrutorComValoresInvalidos() {
+    assertThrows(IllegalArgumentException.class, () -> {
+        new Administrador("João", -1, 3000.0, 15.0, 500.0);
+    }, "Deve lançar uma exceção para código de setor negativo");
+
+    assertThrows(IllegalArgumentException.class, () -> {
+        new Administrador("João", 10, -3000.0, 15.0, 500.0);
+    }, "Deve lançar uma exceção para salário base negativo");
+
+    assertThrows(IllegalArgumentException.class, () -> {
+        new Administrador("João", 10, 3000.0, -15.0, 500.0);
+    }, "Deve lançar uma exceção para imposto negativo");
+
+    assertThrows(IllegalArgumentException.class, () -> {
+        new Administrador("João", 10, 3000.0, 15.0, -500.0);
+    }, "Deve lançar uma exceção para ajuda de custo negativa");
+}
+</code></pre>
+
+    <h3>4. Testar <code>calcularSalario</code> com Vários Cenários</h3>
+    <p>Embora você já tenha um teste para o método <code>calcularSalario</code>, vale a pena testar esse método com diferentes combinações de <code>salarioBase</code>, <code>imposto</code>, e <code>ajudaDeCusto</code> para garantir que a fórmula esteja correta em todos os casos.</p>
+    <pre><code class="language-java">@Test
+public void testCalcularSalarioComVariasCombinacoes() {
+    Administrador admin1 = new Administrador("Alice", "Rua A", "9999-9999", 5, 1000.0, 10.0, 100.0);
+    assertEquals(900.0 + 100.0, admin1.calcularSalario(), 0.01, "Salário calculado deve ser 1000 - 10% + 100");
+
+    Administrador admin2 = new Administrador("Bob", "Rua B", "8888-8888", 6, 2000.0, 20.0, 200.0);
+    assertEquals(1600.0 + 200.0, admin2.calcularSalario(), 0.01, "Salário calculado deve ser 2000 - 20% + 200");
+
+    Administrador admin3 = new Administrador("Eve", "Rua C", "7777-7777", 7, 1500.0, 0.0, 50.0);
+    assertEquals(1500.0 + 50.0, admin3.calcularSalario(), 0.01, "Salário calculado deve ser 1500 - 0% + 50");
+}
+</code></pre>
+
+    <h3>5. Testar <code>toString</code> com Valores Especiais</h3>
+    <p>Verifique se o método <code>toString</code> funciona corretamente quando os valores são muito altos, baixos ou especiais (como zero ou negativos, caso a classe permita).</p>
+    <pre><code class="language-java">@Test
+public void testToStringComValoresEspeciais() {
+    Administrador administrador = new Administrador("João", "", "", 0, 0.0, 0.0);
+    String expected = "Administrador\nNome: João\nEndereço: \nTelefone: \nSetor: 0\nVencimento Base: R$0.0\nImposto: 0.0%\nAjuda de Custo: R$0.0\nSalário: R$0.0";
+    assertEquals(expected, administrador.toString(), "toString deve formatar corretamente para valores nulos/zeros");
+}
+</code></pre>
+
+    <h3>6. Nomes Mais Descritivos</h3>
+    <p>Use nomes de métodos mais descritivos, como <code>deveSerConstruidoComTodosOsParametros</code> em vez de <code>testAdministradorConstrutorComTodosOsParametross</code>. Se alguém lê o teste, deve ser capaz de entender exatamente o que ele faz.</p>
+
+    <h3>7. Linhas Extras e Comentários Desnecessários</h3>
+    <p>Não são necessários os comentários “métodos get” e “métodos set”, por exemplo.</p>
+    <p>Linha extra:<br>
+    - 6 & 7, 29 em <code>Vendedor.java</code></p>
+
+    <h3>8. Besteirinhas</h3>
+    <ul>
+        <li>No construtor <code>Vendedor(String nome, int codigoSetor, double salarioBase, double imposto, double valorVendas, double comissao )</code>, não deve haver espaço no início e no final do parâmetro.</li>
+        <li>Atenção também para typos, como em <code>testAdministradorConstrutorComTodosOsParametross</code>.</li>
+    </ul>
+
+    <h2>Pessoa.java</h2>
+
+    <h3>1. Construtor</h3
+
+>
+    <pre><code class="language-java">public Pessoa(String nome){
+    this.nome = nome;
+    this.endereco = "não informado";
+    this.telefone = "não informado";
+    // linha extra deve ser apagada
+}
+</code></pre>
+    <p>Poderia ser mais detalhado: “Endereço não informado” e “Telefone não informado”.</p>
+    <pre><code class="language-java">public Pessoa(String nome, String endereco){
+    this(nome);
+    this.endereco = endereco;
+}
+</code></pre>
+    <p>Então, um endereço em branco é válido? Isso deveria ser testado e não permitido. Atenção para esse tipo de comportamento com todos os métodos. Geralmente, tudo precisa de validação de valores.</p>
+</body>
+</html>
